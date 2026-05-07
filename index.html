@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>John Louiree B. Tilos | Portfolio</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            scroll-behavior:smooth;
+        }
+
+        body{
+            background:#050505;
+            color:#00ff88;
+            font-family:Consolas, monospace;
+            overflow-x:hidden;
+            position:relative;
+        }
+
+        /* Scanline Effect */
+        body::before{
+            content:"";
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:
+            repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.02),
+                rgba(255,255,255,0.02) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events:none;
+            z-index:999;
+        }
+
+        nav{
+            width:100%;
+            padding:20px 10%;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            position:sticky;
+            top:0;
+            background:#000;
+            border-bottom:1px solid #00ff88;
+            z-index:1000;
+        }
+
+        nav h1{
+            font-size:1.2rem;
+            text-shadow:0 0 10px #00ff88;
+        }
+
+        nav ul{
+            display:flex;
+            gap:25px;
+            list-style:none;
+        }
+
+        nav a{
+            text-decoration:none;
+            color:#00ff88;
+            transition:.3s;
+        }
+
+        nav a:hover{
+            color:#fff;
+            text-shadow:0 0 10px #00ff88;
+        }
+
+        .hero{
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            text-align:center;
+            padding:20px;
+        }
+
+        .hero h2{
+            font-size:4rem;
+            text-shadow:0 0 20px #00ff88;
+            animation:flicker 2s infinite;
+        }
+
+        .hero p{
+            margin-top:20px;
+            font-size:1.2rem;
+            max-width:700px;
+            line-height:1.7;
+        }
+
+        .cursor{
+            display:inline-block;
+            width:10px;
+            background:#00ff88;
+            animation:blink 1s infinite;
+        }
+
+        section{
+            padding:80px 10%;
+        }
+
+        .section-title{
+            font-size:2rem;
+            margin-bottom:30px;
+            border-left:5px solid #00ff88;
+            padding-left:15px;
+            text-shadow:0 0 10px #00ff88;
+        }
+
+        .about-box,
+        .experience-card,
+        .skills-box,
+        .contact-box{
+            background:#0a0a0a;
+            border:1px solid #00ff88;
+            padding:25px;
+            border-radius:10px;
+            box-shadow:0 0 20px rgba(0,255,136,0.15);
+        }
+
+        .about-box p{
+            line-height:1.8;
+        }
+
+        .experience-card{
+            margin-bottom:25px;
+            transition:0.3s;
+        }
+
+        .experience-card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 0 25px rgba(0,255,136,0.4);
+        }
+
+        .experience-card h3{
+            margin-bottom:10px;
+        }
+
+        .experience-card span{
+            color:#ffffff;
+            font-size:.9rem;
+        }
+
+        .experience-card ul{
+            margin-top:15px;
+            padding-left:20px;
+        }
+
+        .experience-card li{
+            margin-bottom:10px;
+        }
+
+        .skills{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:20px;
+        }
+
+        .skill{
+            margin-bottom:20px;
+        }
+
+        .skill h4{
+            margin-bottom:10px;
+        }
+
+        .bar{
+            width:100%;
+            height:20px;
+            background:#111;
+            border:1px solid #00ff88;
+            overflow:hidden;
+            border-radius:20px;
+        }
+
+        .fill{
+            height:100%;
+            background:#00ff88;
+            box-shadow:0 0 15px #00ff88;
+        }
+
+        /* Certifications Grid */
+
+        .certifications-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+            gap:25px;
+        }
+
+        .cert-card{
+            background:#0a0a0a;
+            border:1px solid #00ff88;
+            padding:25px;
+            border-radius:15px;
+            transition:0.3s;
+            box-shadow:0 0 15px rgba(0,255,136,0.2);
+        }
+
+        .cert-card:hover{
+            transform:translateY(-8px);
+            box-shadow:0 0 30px rgba(0,255,136,0.7);
+        }
+
+        .cert-card h3{
+            margin-bottom:10px;
+            font-size:1.2rem;
+        }
+
+        .cert-card span{
+            color:#fff;
+            font-size:.9rem;
+        }
+
+        .cert-card ul{
+            margin-top:15px;
+            padding-left:20px;
+        }
+
+        .cert-card li{
+            margin-bottom:10px;
+        }
+
+        .cert-btn{
+            display:inline-block;
+            margin-top:20px;
+            padding:10px 18px;
+            border:1px solid #00ff88;
+            color:#00ff88;
+            text-decoration:none;
+            border-radius:5px;
+            transition:0.3s;
+            box-shadow:0 0 10px rgba(0,255,136,0.2);
+        }
+
+        .cert-btn:hover{
+            background:#00ff88;
+            color:#000;
+            box-shadow:0 0 20px #00ff88;
+        }
+
+        .contact-box p{
+            margin-bottom:15px;
+        }
+
+        .contact-box a{
+            color:#00ff88;
+            text-decoration:none;
+        }
+
+        .contact-box a:hover{
+            color:#fff;
+            text-shadow:0 0 10px #00ff88;
+        }
+
+        footer{
+            text-align:center;
+            padding:30px;
+            border-top:1px solid #00ff88;
+            margin-top:50px;
+        }
+
+        @keyframes blink{
+            50%{
+                opacity:0;
+            }
+        }
+
+        @keyframes flicker{
+            0%{opacity:1;}
+            5%{opacity:0.8;}
+            10%{opacity:1;}
+            15%{opacity:0.6;}
+            20%{opacity:1;}
+            100%{opacity:1;}
+        }
+
+        @media(max-width:768px){
+
+            .hero h2{
+                font-size:2.5rem;
+            }
+
+            nav{
+                flex-direction:column;
+                gap:15px;
+            }
+
+            nav ul{
+                flex-wrap:wrap;
+                justify-content:center;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <h1>JOHN LOUIREE.EXE</h1>
+
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#certifications">Certifications</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+
+        <h2>
+            JOHN LOUIREE B. TILOS
+        </h2>
+
+        <p>
+            4th Year IT Student |
+            Tech Enthusiast |
+            Future IT Professional
+            <span class="cursor"></span>
+        </p>
+
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+
+        <h2 class="section-title">
+            ABOUT ME
+        </h2>
+
+        <div class="about-box">
+
+            <p>
+                Hello! I'm John Louiree B. Tilos, a 4th Year Information Technology student
+                passionate about technology, networking, system troubleshooting,
+                and modern software development.
+
+                I enjoy exploring hardware systems, configuring networks,
+                and building technology-based projects that improve user experience.
+
+                I also have experience in IT Operations through my internship
+                at Concentrix where I worked on network setup and hardware troubleshooting.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience">
+
+        <h2 class="section-title">
+            EXPERIENCE
+        </h2>
+
+        <div class="experience-card">
+
+            <h3>
+                IT OPERATIONS INTERN
+            </h3>
+
+            <span>
+                Concentrix | MDC 100 Bldg, Eastwood Ave, Quezon City
+                <br>
+                Oct 2025 – Dec 2025
+            </span>
+
+            <ul>
+                <li>Performed network setup and configuration tasks.</li>
+                <li>Conducted hardware troubleshooting and diagnostics.</li>
+                <li>Assisted in maintaining IT operational systems.</li>
+                <li>Supported technical troubleshooting for devices and workstations.</li>
+            </ul>
+
+        </div>
+
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+
+        <h2 class="section-title">
+            SKILLS
+        </h2>
+
+        <div class="skills">
+
+            <div class="skills-box">
+
+                <div class="skill">
+                    <h4>Networking</h4>
+                    <div class="bar">
+                        <div class="fill" style="width:85%;"></div>
+                    </div>
+                </div>
+
+                <div class="skill">
+                    <h4>Hardware Troubleshooting</h4>
+                    <div class="bar">
+                        <div class="fill" style="width:90%;"></div>
+                    </div>
+                </div>
+
+                <div class="skill">
+                    <h4>HTML / CSS</h4>
+                    <div class="bar">
+                        <div class="fill" style="width:80%;"></div>
+                    </div>
+                </div>
+
+                <div class="skill">
+                    <h4>JavaScript</h4>
+                    <div class="bar">
+                        <div class="fill" style="width:70%;"></div>
+                    </div>
+                </div>
+
+                <div class="skill">
+                    <h4>Python</h4>
+                    <div class="bar">
+                        <div class="fill" style="width:75%;"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- CERTIFICATIONS -->
+    <section id="certifications">
+
+        <h2 class="section-title">
+            CERTIFICATIONS
+        </h2>
+
+        <div class="certifications-grid">
+
+            <div class="cert-card">
+                <h3>Oracle Cloud Infrastructure 2023 AI Certified Foundations Associate</h3>
+
+                <span>Oracle | 2023</span>
+
+                <ul>
+                    <li>Learned AI fundamentals and Oracle Cloud AI services.</li>
+                    <li>Understood machine learning concepts and cloud AI tools.</li>
+                </ul>
+
+                <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=CAE2140ED991AE4FC8B29576CC212E7519846DD804E4547B97F1AC08B180FC9E" class="cert-btn" target="_blank">
+                    View Certificate
+                </a>
+            </div>
+
+            <div class="cert-card">
+                <h3>Oracle Cloud Data Management 2023 Certified Foundations Associate</h3>
+
+                <span>Oracle | 2023</span>
+
+                <ul>
+                    <li>Studied cloud database management and storage concepts.</li>
+                    <li>Learned Oracle data lifecycle and DB services.</li>
+                </ul>
+
+                <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=9CBAED8C96555ED3E721E152F12456883774740A7A64A52C296EB08B839B902F" class="cert-btn" target="_blank">
+                    View Certificate
+                </a>
+            </div>
+
+            <div class="cert-card">
+                <h3>Oracle Cloud Infrastructure 2023 Certified Foundations Associate</h3>
+
+                <span>Oracle | 2023</span>
+
+                <ul>
+                    <li>Learned Oracle cloud computing fundamentals.</li>
+                    <li>Understood OCI networking, storage, and security.</li>
+                </ul>
+
+                <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=58517D4C517C083993841E5496ADA0FD8FE853F2C674CD4FB6FBC50103197B5C" class="cert-btn" target="_blank">
+                    View Certificate
+                </a>
+            </div>
+
+            <div class="cert-card">
+                <h3>SQL and Relational Databases 101</h3>
+
+                <span>Database Fundamentals</span>
+
+                <ul>
+                    <li>Learned SQL queries and relational database structures.</li>
+                    <li>Performed basic database operations and management.</li>
+                </ul>
+
+                <a href="https://courses.cognitiveclass.ai/certificates/95e101d1d8194edbb2eff2bb50fa2fa1" class="cert-btn" target="_blank">
+                    View Certificate
+                </a>
+            </div>
+
+            <div class="cert-card">
+                <h3>NoSQL and DBaaS 101</h3>
+
+                <span>Cloud Database Certification</span>
+
+                <ul>
+                    <li>Studied NoSQL databases and cloud DB services.</li>
+                    <li>Learned database deployment and management concepts.</li>
+                </ul>
+
+                <a href="https://courses.cognitiveclass.ai/certificates/7d9925c423ce498fb34daf7e38a4a0e7" class="cert-btn" target="_blank">
+                    View Certificate
+                </a>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+
+        <h2 class="section-title">
+            CONTACT
+        </h2>
+
+        <div class="contact-box">
+
+            <p>
+                Email:
+                <a href="mailto:louitilos@gmail.com">
+                    louitilos@gmail.com
+                </a>
+            </p>
+
+            <p>
+                GitHub:
+                <a href="https://github.com/JohnLouireeTilos/JohnLouireeTilos" target="_blank">
+                    github.com/JohnLouireeTilos
+                </a>
+            </p>
+
+        </div>
+
+    </section>
+
+    <footer>
+        © 2026 John Louiree B. Tilos | Retro Tech Portfolio
+    </footer>
+
+</body>
+</html>
