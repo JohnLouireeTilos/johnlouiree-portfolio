@@ -1,565 +1,1076 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>John Louiree B. Tilos | Portfolio</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>John Louiree B. Tilos | Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00ff88;
+    --green-dim: #00cc6a;
+    --green-glow: rgba(0,255,136,0.3);
+    --green-faint: rgba(0,255,136,0.06);
+    --bg: #030505;
+    --bg2: #080d0a;
+    --white: #e8ffe8;
+    --grey: #3a5a48;
+  }
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            scroll-behavior:smooth;
-        }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        body{
-            background:#050505;
-            color:#00ff88;
-            font-family:Consolas, monospace;
-            overflow-x:hidden;
-            position:relative;
-        }
+  html { scroll-behavior: smooth; }
 
-        /* Scanline Effect */
-        body::before{
-            content:"";
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background:
-            repeating-linear-gradient(
-                to bottom,
-                rgba(255,255,255,0.02),
-                rgba(255,255,255,0.02) 1px,
-                transparent 1px,
-                transparent 3px
-            );
-            pointer-events:none;
-            z-index:999;
-        }
+  body {
+    background: var(--bg);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
 
-        nav{
-            width:100%;
-            padding:20px 10%;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            position:sticky;
-            top:0;
-            background:#000;
-            border-bottom:1px solid #00ff88;
-            z-index:1000;
-        }
+  /* === SCANLINES === */
+  body::after {
+    content:'';
+    position:fixed; inset:0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    pointer-events:none;
+    z-index:9999;
+  }
 
-        nav h1{
-            font-size:1.2rem;
-            text-shadow:0 0 10px #00ff88;
-        }
+  /* === MATRIX RAIN CANVAS === */
+  #matrix-bg {
+    position:fixed; inset:0;
+    z-index:0;
+    opacity:0.18;
+    pointer-events:none;
+  }
 
-        nav ul{
-            display:flex;
-            gap:25px;
-            list-style:none;
-        }
+  /* === NAV === */
+  nav {
+    position:sticky; top:0;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:0 8%;
+    height:64px;
+    background: rgba(3,5,5,0.95);
+    border-bottom: 1px solid var(--green);
+    backdrop-filter: blur(10px);
+    z-index:1000;
+  }
 
-        nav a{
-            text-decoration:none;
-            color:#00ff88;
-            transition:.3s;
-        }
+  .nav-logo {
+    font-family:'Orbitron',monospace;
+    font-weight:900;
+    font-size:.95rem;
+    letter-spacing:2px;
+    color:var(--green);
+    text-shadow: 0 0 15px var(--green);
+    position:relative;
+  }
 
-        nav a:hover{
-            color:#fff;
-            text-shadow:0 0 10px #00ff88;
-        }
+  .nav-logo::before { content:'> '; opacity:.6; }
 
-        .hero{
-            min-height:100vh;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            text-align:center;
-            padding:20px;
-        }
+  nav ul { display:flex; gap:30px; list-style:none; }
+  nav a {
+    color:var(--green);
+    text-decoration:none;
+    font-size:.8rem;
+    letter-spacing:2px;
+    padding: 4px 0;
+    position:relative;
+    transition:.3s;
+  }
+  nav a::after {
+    content:'';
+    position:absolute; bottom:0; left:0;
+    width:0; height:1px;
+    background:var(--green);
+    transition:.3s;
+    box-shadow: 0 0 8px var(--green);
+  }
+  nav a:hover { color:#fff; text-shadow: 0 0 10px var(--green); }
+  nav a:hover::after { width:100%; }
 
-        .hero h2{
-            font-size:4rem;
-            text-shadow:0 0 20px #00ff88;
-            animation:flicker 2s infinite;
-        }
+  /* === HERO === */
+  .hero {
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+    padding: 0 10%;
+    overflow:hidden;
+    z-index:1;
+  }
 
-        .hero p{
-            margin-top:20px;
-            font-size:1.2rem;
-            max-width:700px;
-            line-height:1.7;
-        }
+  .hero-grid-overlay {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--green-faint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--green-faint) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    pointer-events:none;
+  }
 
-        .cursor{
-            display:inline-block;
-            width:10px;
-            background:#00ff88;
-            animation:blink 1s infinite;
-        }
+  .hero-label {
+    font-size:.75rem;
+    letter-spacing:4px;
+    color:var(--green-dim);
+    margin-bottom:20px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .hero-label::before { content:''; width:40px; height:1px; background:var(--green-dim); display:block; }
 
-        section{
-            padding:80px 10%;
-        }
+  .hero h1 {
+    font-family:'Orbitron',monospace;
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+    font-weight:900;
+    line-height:1.1;
+    letter-spacing:2px;
+    text-shadow: 0 0 40px var(--green), 0 0 80px rgba(0,255,136,0.2);
+    animation: flicker 6s infinite;
+    margin-bottom:30px;
+    color: var(--white);
+  }
 
-        .section-title{
-            font-size:2rem;
-            margin-bottom:30px;
-            border-left:5px solid #00ff88;
-            padding-left:15px;
-            text-shadow:0 0 10px #00ff88;
-        }
+  .hero h1 span { color:var(--green); }
 
-        .about-box,
-        .experience-card,
-        .skills-box,
-        .contact-box{
-            background:#0a0a0a;
-            border:1px solid #00ff88;
-            padding:25px;
-            border-radius:10px;
-            box-shadow:0 0 20px rgba(0,255,136,0.15);
-        }
+  .hero-subtitle {
+    font-size:1rem;
+    color:var(--green-dim);
+    letter-spacing:2px;
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    margin-bottom:50px;
+  }
 
-        .about-box p{
-            line-height:1.8;
-        }
+  .hero-subtitle .tag {
+    border:1px solid var(--grey);
+    padding:4px 12px;
+    border-radius:2px;
+    font-size:.75rem;
+    letter-spacing:2px;
+    transition:.3s;
+  }
+  .hero-subtitle .tag:hover {
+    border-color:var(--green);
+    box-shadow: 0 0 10px var(--green-glow);
+  }
 
-        .experience-card{
-            margin-bottom:25px;
-            transition:0.3s;
-        }
+  .hero-cta {
+    display:flex; gap:20px; flex-wrap:wrap;
+  }
 
-        .experience-card:hover{
-            transform:translateY(-5px);
-            box-shadow:0 0 25px rgba(0,255,136,0.4);
-        }
+  .btn {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 28px;
+    border:1px solid var(--green);
+    color:var(--green);
+    text-decoration:none;
+    font-family:'Share Tech Mono',monospace;
+    font-size:.8rem;
+    letter-spacing:2px;
+    transition:.3s;
+    position:relative;
+    overflow:hidden;
+    cursor:crosshair;
+  }
+  .btn::before {
+    content:'';
+    position:absolute; top:0; left:-100%;
+    width:100%; height:100%;
+    background:rgba(0,255,136,0.08);
+    transition:.4s;
+  }
+  .btn:hover::before { left:0; }
+  .btn:hover { color:#fff; box-shadow: 0 0 20px var(--green-glow); text-shadow:0 0 10px var(--green); }
+  .btn.solid { background:var(--green); color:#000; }
+  .btn.solid:hover { background:#fff; color:#000; }
 
-        .experience-card h3{
-            margin-bottom:10px;
-        }
+  .hero-scroll {
+    position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    font-size:.65rem; letter-spacing:3px; color:var(--grey);
+    animation: pulse 2s infinite;
+  }
+  .scroll-line {
+    width:1px; height:50px;
+    background: linear-gradient(var(--green), transparent);
+    animation: scrollDrop 2s infinite;
+  }
 
-        .experience-card span{
-            color:#ffffff;
-            font-size:.9rem;
-        }
+  /* === SECTIONS === */
+  section {
+    padding: 100px 10%;
+    position:relative;
+    z-index:1;
+  }
 
-        .experience-card ul{
-            margin-top:15px;
-            padding-left:20px;
-        }
+  .section-header {
+    display:flex; align-items:center; gap:20px;
+    margin-bottom:60px;
+  }
 
-        .experience-card li{
-            margin-bottom:10px;
-        }
+  .section-num {
+    font-family:'VT323',monospace;
+    font-size:5rem;
+    color:rgba(0,255,136,0.08);
+    line-height:1;
+    user-select:none;
+    margin-right:-10px;
+  }
 
-        .skills{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-            gap:20px;
-        }
+  .section-title {
+    font-family:'Orbitron',monospace;
+    font-size:1.4rem;
+    font-weight:700;
+    letter-spacing:4px;
+    color:var(--white);
+    text-shadow:0 0 20px var(--green-glow);
+  }
+  .section-title::after {
+    content:'';
+    display:block;
+    width:60px; height:2px;
+    background:var(--green);
+    margin-top:10px;
+    box-shadow: 0 0 10px var(--green);
+  }
 
-        .skill{
-            margin-bottom:20px;
-        }
+  /* === ABOUT === */
+  .about-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:40px;
+    align-items:center;
+  }
 
-        .skill h4{
-            margin-bottom:10px;
-        }
+  .about-text {
+    border:1px solid var(--grey);
+    border-left:3px solid var(--green);
+    padding:35px;
+    background:var(--green-faint);
+    line-height:2;
+    color:var(--white);
+    font-size:.9rem;
+    position:relative;
+  }
+  .about-text::before {
+    content:'// ABOUT.TXT';
+    position:absolute; top:-1px; left:20px;
+    background:var(--bg);
+    padding:0 8px;
+    font-size:.7rem;
+    color:var(--green-dim);
+    letter-spacing:2px;
+  }
 
-        .bar{
-            width:100%;
-            height:20px;
-            background:#111;
-            border:1px solid #00ff88;
-            overflow:hidden;
-            border-radius:20px;
-        }
+  .about-stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:20px;
+  }
 
-        .fill{
-            height:100%;
-            background:#00ff88;
-            box-shadow:0 0 15px #00ff88;
-        }
+  .stat-box {
+    border:1px solid var(--grey);
+    padding:25px 20px;
+    text-align:center;
+    background:var(--green-faint);
+    transition:.3s;
+    cursor:default;
+  }
+  .stat-box:hover {
+    border-color:var(--green);
+    box-shadow:0 0 20px var(--green-glow);
+    transform:translateY(-4px);
+  }
+  .stat-num {
+    font-family:'VT323',monospace;
+    font-size:3.5rem;
+    color:var(--green);
+    text-shadow:0 0 15px var(--green);
+    line-height:1;
+    display:block;
+  }
+  .stat-label {
+    font-size:.7rem;
+    letter-spacing:2px;
+    color:var(--grey);
+    margin-top:8px;
+    display:block;
+  }
 
-        /* Certifications Grid */
+  /* === EXPERIENCE === */
+  .timeline { position:relative; padding-left:40px; }
+  .timeline::before {
+    content:'';
+    position:absolute; left:0; top:0; bottom:0;
+    width:1px;
+    background:linear-gradient(var(--green), transparent);
+  }
 
-        .certifications-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
-            gap:25px;
-        }
+  .exp-card {
+    position:relative;
+    margin-bottom:50px;
+    padding:35px;
+    border:1px solid var(--grey);
+    background:var(--green-faint);
+    transition:.4s;
+  }
+  .exp-card::before {
+    content:'';
+    position:absolute; left:-47px; top:35px;
+    width:14px; height:14px;
+    border:2px solid var(--green);
+    background:var(--bg);
+    border-radius:50%;
+    box-shadow:0 0 10px var(--green);
+  }
+  .exp-card:hover {
+    border-color:var(--green);
+    box-shadow:0 0 30px var(--green-glow);
+    transform:translateX(8px);
+  }
 
-        .cert-card{
-            background:#0a0a0a;
-            border:1px solid #00ff88;
-            padding:25px;
-            border-radius:15px;
-            transition:0.3s;
-            box-shadow:0 0 15px rgba(0,255,136,0.2);
-        }
+  .exp-header {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    flex-wrap:wrap; gap:10px;
+    margin-bottom:15px;
+  }
+  .exp-title {
+    font-family:'Orbitron',monospace;
+    font-size:1rem;
+    font-weight:700;
+    color:var(--white);
+    letter-spacing:2px;
+  }
+  .exp-badge {
+    background:rgba(0,255,136,0.1);
+    border:1px solid var(--green);
+    color:var(--green);
+    padding:4px 12px;
+    font-size:.7rem;
+    letter-spacing:2px;
+  }
+  .exp-company {
+    color:var(--green-dim);
+    font-size:.8rem;
+    letter-spacing:2px;
+    margin-bottom:20px;
+  }
+  .exp-company::before { content:'@ '; }
+  .exp-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .exp-list li {
+    color:var(--white);
+    font-size:.85rem;
+    line-height:1.6;
+    padding-left:20px;
+    position:relative;
+    opacity:.85;
+  }
+  .exp-list li::before {
+    content:'▸';
+    position:absolute; left:0;
+    color:var(--green);
+  }
 
-        .cert-card:hover{
-            transform:translateY(-8px);
-            box-shadow:0 0 30px rgba(0,255,136,0.7);
-        }
+  /* === SKILLS === */
+  .skills-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:30px;
+  }
 
-        .cert-card h3{
-            margin-bottom:10px;
-            font-size:1.2rem;
-        }
+  .skills-panel {
+    border:1px solid var(--grey);
+    padding:35px;
+    background:var(--green-faint);
+    position:relative;
+  }
+  .skills-panel::before {
+    content: attr(data-label);
+    position:absolute; top:-1px; left:20px;
+    background:var(--bg);
+    padding:0 8px;
+    font-size:.65rem;
+    color:var(--green-dim);
+    letter-spacing:3px;
+  }
 
-        .cert-card span{
-            color:#fff;
-            font-size:.9rem;
-        }
+  .skill-item { margin-bottom:28px; }
+  .skill-item:last-child { margin-bottom:0; }
 
-        .cert-card ul{
-            margin-top:15px;
-            padding-left:20px;
-        }
+  .skill-row {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:8px;
+  }
+  .skill-name { font-size:.85rem; color:var(--white); letter-spacing:1px; }
+  .skill-pct { font-family:'VT323',monospace; font-size:1.2rem; color:var(--green); }
 
-        .cert-card li{
-            margin-bottom:10px;
-        }
+  .skill-track {
+    width:100%; height:6px;
+    background:rgba(0,255,136,0.08);
+    border:1px solid var(--grey);
+    position:relative;
+    overflow:visible;
+  }
+  .skill-fill {
+    height:100%;
+    background:var(--green);
+    box-shadow:0 0 12px var(--green);
+    position:relative;
+    transition: width 1.5s cubic-bezier(.2,.8,.2,1);
+    width:0;
+  }
+  .skill-fill::after {
+    content:'';
+    position:absolute; right:-3px; top:50%;
+    transform:translateY(-50%);
+    width:6px; height:6px;
+    background:var(--green);
+    border-radius:50%;
+    box-shadow:0 0 8px var(--green);
+  }
 
-        .cert-btn{
-            display:inline-block;
-            margin-top:20px;
-            padding:10px 18px;
-            border:1px solid #00ff88;
-            color:#00ff88;
-            text-decoration:none;
-            border-radius:5px;
-            transition:0.3s;
-            box-shadow:0 0 10px rgba(0,255,136,0.2);
-        }
+  /* === CERTIFICATIONS === */
+  .certs-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+  }
 
-        .cert-btn:hover{
-            background:#00ff88;
-            color:#000;
-            box-shadow:0 0 20px #00ff88;
-        }
+  .cert-card {
+    border:1px solid var(--grey);
+    padding:30px;
+    background:var(--green-faint);
+    position:relative;
+    overflow:hidden;
+    transition:.4s;
+    display:flex; flex-direction:column;
+  }
+  .cert-card::before {
+    content:'';
+    position:absolute; top:0; left:0;
+    width:3px; height:100%;
+    background:var(--green);
+    transform:scaleY(0);
+    transition:.4s;
+    transform-origin:bottom;
+  }
+  .cert-card:hover::before { transform:scaleY(1); }
+  .cert-card:hover {
+    border-color:var(--green);
+    box-shadow:0 0 30px var(--green-glow);
+    transform:translateY(-6px);
+  }
 
-        .contact-box p{
-            margin-bottom:15px;
-        }
+  .cert-issuer {
+    font-size:.7rem;
+    letter-spacing:3px;
+    color:var(--green);
+    margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .cert-issuer::before {
+    content:'';
+    width:20px; height:1px;
+    background:var(--green);
+    display:inline-block;
+  }
 
-        .contact-box a{
-            color:#00ff88;
-            text-decoration:none;
-        }
+  .cert-title {
+    font-family:'Orbitron',monospace;
+    font-size:.85rem;
+    font-weight:700;
+    color:var(--white);
+    margin-bottom:20px;
+    line-height:1.5;
+    letter-spacing:1px;
+    flex:1;
+  }
 
-        .contact-box a:hover{
-            color:#fff;
-            text-shadow:0 0 10px #00ff88;
-        }
+  .cert-skills {
+    list-style:none;
+    margin-bottom:25px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .cert-skills li {
+    font-size:.78rem;
+    color:rgba(232,255,232,0.7);
+    padding-left:15px;
+    position:relative;
+    line-height:1.5;
+  }
+  .cert-skills li::before { content:'—'; position:absolute; left:0; color:var(--green-dim); }
 
-        footer{
-            text-align:center;
-            padding:30px;
-            border-top:1px solid #00ff88;
-            margin-top:50px;
-        }
+  .cert-link {
+    display:inline-flex; align-items:center; gap:8px;
+    color:var(--green);
+    text-decoration:none;
+    font-size:.75rem;
+    letter-spacing:2px;
+    border-bottom:1px solid var(--grey);
+    padding-bottom:4px;
+    width:fit-content;
+    transition:.3s;
+  }
+  .cert-link:hover { color:#fff; border-color:var(--green); }
+  .cert-link::after { content:'↗'; }
 
-        @keyframes blink{
-            50%{
-                opacity:0;
-            }
-        }
+  /* === CONTACT === */
+  .contact-wrapper {
+    display:grid; grid-template-columns:1fr 1fr; gap:60px;
+    align-items:center;
+  }
 
-        @keyframes flicker{
-            0%{opacity:1;}
-            5%{opacity:0.8;}
-            10%{opacity:1;}
-            15%{opacity:0.6;}
-            20%{opacity:1;}
-            100%{opacity:1;}
-        }
+  .contact-heading {
+    font-family:'VT323',monospace;
+    font-size:4rem;
+    line-height:1.2;
+    color:var(--white);
+    text-shadow:0 0 30px var(--green-glow);
+  }
+  .contact-heading span { color:var(--green); }
+  .contact-sub {
+    margin-top:20px;
+    color:var(--grey);
+    font-size:.85rem;
+    line-height:2;
+    letter-spacing:1px;
+  }
 
-        @media(max-width:768px){
+  .contact-links { display:flex; flex-direction:column; gap:20px; }
 
-            .hero h2{
-                font-size:2.5rem;
-            }
+  .contact-item {
+    display:flex; align-items:center; gap:20px;
+    border:1px solid var(--grey);
+    padding:20px 25px;
+    background:var(--green-faint);
+    text-decoration:none;
+    transition:.3s;
+  }
+  .contact-item:hover {
+    border-color:var(--green);
+    box-shadow:0 0 20px var(--green-glow);
+    transform:translateX(6px);
+  }
+  .contact-icon {
+    font-family:'VT323',monospace;
+    font-size:2rem;
+    color:var(--green);
+    width:40px;
+    text-align:center;
+  }
+  .contact-info { flex:1; }
+  .contact-label { font-size:.65rem; letter-spacing:3px; color:var(--grey); display:block; margin-bottom:4px; }
+  .contact-val { font-size:.85rem; color:var(--white); }
 
-            nav{
-                flex-direction:column;
-                gap:15px;
-            }
+  /* === FOOTER === */
+  footer {
+    padding:40px 10%;
+    border-top:1px solid var(--grey);
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.7rem; letter-spacing:2px; color:var(--grey);
+    position:relative; z-index:1;
+    flex-wrap:wrap; gap:10px;
+  }
+  footer span { color:var(--green); }
 
-            nav ul{
-                flex-wrap:wrap;
-                justify-content:center;
-            }
+  /* === CURSOR BLINK === */
+  .cursor {
+    display:inline-block;
+    width:2px; height:1em;
+    background:var(--green);
+    margin-left:4px;
+    vertical-align:middle;
+    animation:blink 1s step-end infinite;
+  }
 
-        }
-    </style>
+  /* === GLITCH TEXT === */
+  .glitch {
+    position:relative;
+  }
+  .glitch::before, .glitch::after {
+    content:attr(data-text);
+    position:absolute; inset:0;
+    overflow:hidden;
+  }
+  .glitch::before {
+    color:#0ff;
+    animation: glitch1 4s infinite;
+    clip-path:polygon(0 0,100% 0,100% 45%,0 45%);
+  }
+  .glitch::after {
+    color:#f0f;
+    animation: glitch2 4s infinite;
+    clip-path:polygon(0 55%,100% 55%,100% 100%,0 100%);
+  }
+
+  /* === ANIMATIONS === */
+  @keyframes blink { 50%{opacity:0;} }
+  @keyframes flicker {
+    0%,19%,21%,23%,25%,54%,56%,100%{opacity:1;}
+    20%,24%,55%{opacity:.4;}
+  }
+  @keyframes pulse { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+  @keyframes scrollDrop {
+    0%{transform:scaleY(0); transform-origin:top;}
+    50%{transform:scaleY(1); transform-origin:top;}
+    51%{transform:scaleY(1); transform-origin:bottom;}
+    100%{transform:scaleY(0); transform-origin:bottom;}
+  }
+  @keyframes glitch1 {
+    0%,100%{transform:none;} 25%{transform:translate(-2px,0) skewX(-1deg);} 75%{transform:translate(2px,0);}
+  }
+  @keyframes glitch2 {
+    0%,100%{transform:none;} 33%{transform:translate(2px,0) skewX(1deg);} 66%{transform:translate(-2px,0);}
+  }
+
+  /* fade-in on scroll */
+  .reveal { opacity:0; transform:translateY(30px); transition:.8s cubic-bezier(.2,.8,.2,1); }
+  .reveal.visible { opacity:1; transform:none; }
+
+  /* === RESPONSIVE (about/contact) === */
+  @media(max-width:900px) {
+    .about-grid, .contact-wrapper { grid-template-columns:1fr; }
+  }
+
+  /* terminal prompt line in hero */
+  .prompt-line {
+    display:flex; align-items:center; gap:8px;
+    font-size:.8rem; color:var(--green-dim); margin-bottom:15px;
+  }
+  .prompt-line .prompt { color:var(--green); }
+
+  /* === HERO LAYOUT === */
+  .hero-inner {
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:60px;
+    align-items:center;
+    width:100%;
+    max-width:1100px;
+  }
+
+  /* === PROFILE PICTURE === */
+  .profile-frame {
+    position:relative;
+    width:260px;
+    height:260px;
+    flex-shrink:0;
+  }
+
+  /* Spinning border ring */
+  .profile-frame::before {
+    content:'';
+    position:absolute;
+    inset:-6px;
+    border-radius:50%;
+    background: conic-gradient(var(--green) 0deg, transparent 120deg, var(--green) 240deg, transparent 360deg);
+    animation: spinRing 4s linear infinite;
+    z-index:0;
+  }
+
+  /* Corner brackets */
+  .profile-frame::after {
+    content:'';
+    position:absolute;
+    inset:-14px;
+    border-radius:50%;
+    border:1px solid var(--grey);
+    z-index:0;
+  }
+
+  .profile-img-wrap {
+    position:relative;
+    width:100%; height:100%;
+    border-radius:50%;
+    overflow:hidden;
+    border:2px solid var(--green);
+    box-shadow: 0 0 30px var(--green-glow), inset 0 0 20px rgba(0,255,136,0.05);
+    z-index:1;
+    background: var(--bg2);
+  }
+
+  .profile-img-wrap img {
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+    filter: grayscale(20%) contrast(1.1);
+    transition:.4s;
+  }
+  .profile-img-wrap img:hover { filter:grayscale(0%) contrast(1.2); }
+
+
+
+  /* Status tag below photo */
+  .profile-status {
+    position:absolute;
+    bottom:-20px; left:50%;
+    transform:translateX(-50%);
+    background:var(--bg);
+    border:1px solid var(--green);
+    padding:4px 14px;
+    font-size:.65rem;
+    letter-spacing:2px;
+    color:var(--green);
+    white-space:nowrap;
+    box-shadow:0 0 10px var(--green-glow);
+    z-index:2;
+  }
+  .profile-status::before { content:'● '; animation:blink 1.2s infinite; }
+
+  @keyframes spinRing {
+    from { transform:rotate(0deg); }
+    to   { transform:rotate(360deg); }
+  }
+
+  @media(max-width:900px) {
+    .hero-inner { grid-template-columns:1fr; justify-items:center; }
+    .profile-frame { width:200px; height:200px; }
+    .hero { align-items:center; text-align:center; }
+    .hero-label { justify-content:center; }
+    .hero-subtitle { justify-content:center; }
+    .hero-cta { justify-content:center; }
+    nav { flex-direction:column; height:auto; padding:15px 5%; gap:12px; }
+    nav ul { flex-wrap:wrap; justify-content:center; gap:15px; }
+  }
+</style>
 </head>
-
 <body>
 
-    <nav>
-        <h1>JOHN LOUIREE.EXE</h1>
+<canvas id="matrix-bg"></canvas>
 
-        <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#experience">Experience</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#certifications">Certifications</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">JOHN_TILOS.EXE</div>
+  <ul>
+    <li><a href="#about">ABOUT</a></li>
+    <li><a href="#experience">EXP</a></li>
+    <li><a href="#skills">SKILLS</a></li>
+    <li><a href="#certifications">CERTS</a></li>
+    <li><a href="#contact">CONTACT</a></li>
+  </ul>
+</nav>
 
-    <!-- HERO -->
-    <section class="hero">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-overlay"></div>
 
-        <h2>
-            JOHN LOUIREE B. TILOS
-        </h2>
+  <div class="hero-inner">
+    <!-- LEFT: Text -->
+    <div>
+      <div class="prompt-line">
+        <span class="prompt">~/portfolio $</span>
+        <span>whoami</span>
+      </div>
 
-        <p>
-            4th Year IT Student |
-            Tech Enthusiast |
-            Future IT Professional
-            <span class="cursor"></span>
-        </p>
+      <div class="hero-label">IT STUDENT & TECH ENTHUSIAST</div>
 
-    </section>
+      <h1 class="glitch" data-text="JOHN LOUIREE B. TILOS">JOHN LOUIREE<br><span>B. TILOS</span></h1>
 
-    <!-- ABOUT -->
-    <section id="about">
+      <div class="hero-subtitle">
+        <span class="tag">4TH YEAR IT</span>
+        <span class="tag">NETWORKING</span>
+        <span class="tag">CLOUD CERTIFIED</span>
+        <span class="tag">HARDWARE</span>
+        <span class="tag">WEB DEV</span>
+      </div>
 
-        <h2 class="section-title">
-            ABOUT ME
-        </h2>
+      <div class="hero-cta">
+        <a href="#about" class="btn solid">EXPLORE PROFILE</a>
+        <a href="#contact" class="btn">GET IN TOUCH</a>
+      </div>
+    </div>
 
-        <div class="about-box">
+    <!-- RIGHT: Profile Picture -->
+    <div class="profile-frame">
+      <div class="profile-img-wrap">
+        <!-- ✏️ TO USE YOUR PHOTO: save your image as "profile.jpg" in the same folder as this HTML file -->
+        <img src="profile.jpg" alt="John Louiree B. Tilos">
+      </div>
+      <div class="profile-status">AVAILABLE FOR HIRE</div>
+    </div>
+  </div>
 
-            <p>
-                Hello! I'm John Louiree B. Tilos, a 4th Year Information Technology student
-                passionate about technology, networking, system troubleshooting,
-                and modern software development.
+  <div class="hero-scroll">
+    SCROLL
+    <div class="scroll-line"></div>
+  </div>
+</section>
 
-                I enjoy exploring hardware systems, configuring networks,
-                and building technology-based projects that improve user experience.
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <div class="section-num">01</div>
+    <div class="section-title">ABOUT ME</div>
+  </div>
 
-                I also have experience in IT Operations through my internship
-                at Concentrix where I worked on network setup and hardware troubleshooting.
-            </p>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      Hello! I'm John Louiree B. Tilos, a 4th Year Information Technology student
+      passionate about technology, networking, system troubleshooting,
+      and modern software development.<br><br>
+      I enjoy exploring hardware systems, configuring networks,
+      and building technology-based projects that improve user experience.
+      I also have experience in IT Operations through my internship
+      at Concentrix where I worked on network setup and hardware troubleshooting.<span class="cursor"></span>
+    </div>
 
+    <div class="about-stats reveal">
+      <div class="stat-box">
+        <span class="stat-num">4th</span>
+        <span class="stat-label">YEAR IT STUDENT</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">5</span>
+        <span class="stat-label">CERTIFICATIONS</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">3</span>
+        <span class="stat-label">ORACLE BADGES</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">PASSION FOR IT</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header reveal">
+    <div class="section-num">02</div>
+    <div class="section-title">EXPERIENCE</div>
+  </div>
+
+  <div class="timeline">
+    <div class="exp-card reveal">
+      <div class="exp-header">
+        <div class="exp-title">IT OPERATIONS INTERN</div>
+        <div class="exp-badge">OCT – DEC 2025</div>
+      </div>
+      <div class="exp-company">Concentrix | MDC 100 Bldg, Eastwood Ave, Quezon City</div>
+      <ul class="exp-list">
+        <li>Performed network setup and configuration tasks across office infrastructure.</li>
+        <li>Conducted hardware troubleshooting and diagnostics on workstations.</li>
+        <li>Assisted in maintaining IT operational systems and uptime.</li>
+        <li>Supported technical troubleshooting for devices and end-user workstations.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header reveal">
+    <div class="section-num">03</div>
+    <div class="section-title">SKILLS</div>
+  </div>
+
+  <div class="skills-grid">
+    <div class="skills-panel reveal" data-label="// CORE_SKILLS.LOG">
+      <div class="skill-item">
+        <div class="skill-row">
+          <span class="skill-name">Hardware Troubleshooting</span>
+          <span class="skill-pct">90%</span>
         </div>
-
-    </section>
-
-    <!-- EXPERIENCE -->
-    <section id="experience">
-
-        <h2 class="section-title">
-            EXPERIENCE
-        </h2>
-
-        <div class="experience-card">
-
-            <h3>
-                IT OPERATIONS INTERN
-            </h3>
-
-            <span>
-                Concentrix | MDC 100 Bldg, Eastwood Ave, Quezon City
-                <br>
-                Oct 2025 – Dec 2025
-            </span>
-
-            <ul>
-                <li>Performed network setup and configuration tasks.</li>
-                <li>Conducted hardware troubleshooting and diagnostics.</li>
-                <li>Assisted in maintaining IT operational systems.</li>
-                <li>Supported technical troubleshooting for devices and workstations.</li>
-            </ul>
-
+        <div class="skill-track"><div class="skill-fill" data-width="90"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-row">
+          <span class="skill-name">Networking</span>
+          <span class="skill-pct">85%</span>
         </div>
-
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills">
-
-        <h2 class="section-title">
-            SKILLS
-        </h2>
-
-        <div class="skills">
-
-            <div class="skills-box">
-
-                <div class="skill">
-                    <h4>Networking</h4>
-                    <div class="bar">
-                        <div class="fill" style="width:85%;"></div>
-                    </div>
-                </div>
-
-                <div class="skill">
-                    <h4>Hardware Troubleshooting</h4>
-                    <div class="bar">
-                        <div class="fill" style="width:90%;"></div>
-                    </div>
-                </div>
-
-                <div class="skill">
-                    <h4>HTML / CSS</h4>
-                    <div class="bar">
-                        <div class="fill" style="width:80%;"></div>
-                    </div>
-                </div>
-
-                <div class="skill">
-                    <h4>JavaScript</h4>
-                    <div class="bar">
-                        <div class="fill" style="width:70%;"></div>
-                    </div>
-                </div>
-
-                <div class="skill">
-                    <h4>Python</h4>
-                    <div class="bar">
-                        <div class="fill" style="width:75%;"></div>
-                    </div>
-                </div>
-
-            </div>
-
+        <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-row">
+          <span class="skill-name">Python</span>
+          <span class="skill-pct">75%</span>
         </div>
+        <div class="skill-track"><div class="skill-fill" data-width="75"></div></div>
+      </div>
+    </div>
 
-    </section>
-
-    <!-- CERTIFICATIONS -->
-    <section id="certifications">
-
-        <h2 class="section-title">
-            CERTIFICATIONS
-        </h2>
-
-        <div class="certifications-grid">
-
-            <div class="cert-card">
-                <h3>Oracle Cloud Infrastructure 2023 AI Certified Foundations Associate</h3>
-
-                <span>Oracle | 2023</span>
-
-                <ul>
-                    <li>Learned AI fundamentals and Oracle Cloud AI services.</li>
-                    <li>Understood machine learning concepts and cloud AI tools.</li>
-                </ul>
-
-                <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=CAE2140ED991AE4FC8B29576CC212E7519846DD804E4547B97F1AC08B180FC9E" class="cert-btn" target="_blank">
-                    View Certificate
-                </a>
-            </div>
-
-            <div class="cert-card">
-                <h3>Oracle Cloud Data Management 2023 Certified Foundations Associate</h3>
-
-                <span>Oracle | 2023</span>
-
-                <ul>
-                    <li>Studied cloud database management and storage concepts.</li>
-                    <li>Learned Oracle data lifecycle and DB services.</li>
-                </ul>
-
-                <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=9CBAED8C96555ED3E721E152F12456883774740A7A64A52C296EB08B839B902F" class="cert-btn" target="_blank">
-                    View Certificate
-                </a>
-            </div>
-
-            <div class="cert-card">
-                <h3>Oracle Cloud Infrastructure 2023 Certified Foundations Associate</h3>
-
-                <span>Oracle | 2023</span>
-
-                <ul>
-                    <li>Learned Oracle cloud computing fundamentals.</li>
-                    <li>Understood OCI networking, storage, and security.</li>
-                </ul>
-
-                <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=58517D4C517C083993841E5496ADA0FD8FE853F2C674CD4FB6FBC50103197B5C" class="cert-btn" target="_blank">
-                    View Certificate
-                </a>
-            </div>
-
-            <div class="cert-card">
-                <h3>SQL and Relational Databases 101</h3>
-
-                <span>Database Fundamentals</span>
-
-                <ul>
-                    <li>Learned SQL queries and relational database structures.</li>
-                    <li>Performed basic database operations and management.</li>
-                </ul>
-
-                <a href="https://courses.cognitiveclass.ai/certificates/95e101d1d8194edbb2eff2bb50fa2fa1" class="cert-btn" target="_blank">
-                    View Certificate
-                </a>
-            </div>
-
-            <div class="cert-card">
-                <h3>NoSQL and DBaaS 101</h3>
-
-                <span>Cloud Database Certification</span>
-
-                <ul>
-                    <li>Studied NoSQL databases and cloud DB services.</li>
-                    <li>Learned database deployment and management concepts.</li>
-                </ul>
-
-                <a href="https://courses.cognitiveclass.ai/certificates/7d9925c423ce498fb34daf7e38a4a0e7" class="cert-btn" target="_blank">
-                    View Certificate
-                </a>
-            </div>
-
+    <div class="skills-panel reveal" data-label="// WEB_DEV.LOG">
+      <div class="skill-item">
+        <div class="skill-row">
+          <span class="skill-name">HTML / CSS</span>
+          <span class="skill-pct">80%</span>
         </div>
-
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact">
-
-        <h2 class="section-title">
-            CONTACT
-        </h2>
-
-        <div class="contact-box">
-
-            <p>
-                Email:
-                <a href="mailto:louitilos@gmail.com">
-                    louitilos@gmail.com
-                </a>
-            </p>
-
-            <p>
-                GitHub:
-                <a href="https://github.com/JohnLouireeTilos/JohnLouireeTilos" target="_blank">
-                    github.com/JohnLouireeTilos
-                </a>
-            </p>
-
+        <div class="skill-track"><div class="skill-fill" data-width="80"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-row">
+          <span class="skill-name">JavaScript</span>
+          <span class="skill-pct">70%</span>
         </div>
+        <div class="skill-track"><div class="skill-fill" data-width="70"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-row">
+          <span class="skill-name">SQL & Databases</span>
+          <span class="skill-pct">78%</span>
+        </div>
+        <div class="skill-track"><div class="skill-fill" data-width="78"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    </section>
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-header reveal">
+    <div class="section-num">04</div>
+    <div class="section-title">CERTIFICATIONS</div>
+  </div>
 
-    <footer>
-        © 2026 John Louiree B. Tilos | Portfolio
-    </footer>
+  <div class="certs-grid">
 
+    <div class="cert-card reveal">
+      <div class="cert-issuer">ORACLE · 2023</div>
+      <div class="cert-title">Oracle Cloud Infrastructure 2023 AI Certified Foundations Associate</div>
+      <ul class="cert-skills">
+        <li>Learned AI fundamentals and Oracle Cloud AI services.</li>
+        <li>Understood machine learning concepts and cloud AI tools.</li>
+      </ul>
+      <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=CAE2140ED991AE4FC8B29576CC212E7519846DD804E4547B97F1AC08B180FC9E" class="cert-link" target="_blank">VIEW CREDENTIAL</a>
+    </div>
+
+    <div class="cert-card reveal">
+      <div class="cert-issuer">ORACLE · 2023</div>
+      <div class="cert-title">Oracle Cloud Data Management 2023 Certified Foundations Associate</div>
+      <ul class="cert-skills">
+        <li>Studied cloud database management and storage concepts.</li>
+        <li>Learned Oracle data lifecycle and DB services.</li>
+      </ul>
+      <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=9CBAED8C96555ED3E721E152F12456883774740A7A64A52C296EB08B839B902F" class="cert-link" target="_blank">VIEW CREDENTIAL</a>
+    </div>
+
+    <div class="cert-card reveal">
+      <div class="cert-issuer">ORACLE · 2023</div>
+      <div class="cert-title">Oracle Cloud Infrastructure 2023 Certified Foundations Associate</div>
+      <ul class="cert-skills">
+        <li>Learned Oracle cloud computing fundamentals.</li>
+        <li>Understood OCI networking, storage, and security.</li>
+      </ul>
+      <a href="https://catalog-education.oracle.com/ords/certview/sharebadge?id=58517D4C517C083993841E5496ADA0FD8FE853F2C674CD4FB6FBC50103197B5C" class="cert-link" target="_blank">VIEW CREDENTIAL</a>
+    </div>
+
+    <div class="cert-card reveal">
+      <div class="cert-issuer">COGNITIVE CLASS</div>
+      <div class="cert-title">SQL and Relational Databases 101</div>
+      <ul class="cert-skills">
+        <li>Learned SQL queries and relational database structures.</li>
+        <li>Performed basic database operations and management.</li>
+      </ul>
+      <a href="https://courses.cognitiveclass.ai/certificates/95e101d1d8194edbb2eff2bb50fa2fa1" class="cert-link" target="_blank">VIEW CREDENTIAL</a>
+    </div>
+
+    <div class="cert-card reveal">
+      <div class="cert-issuer">COGNITIVE CLASS</div>
+      <div class="cert-title">NoSQL and DBaaS 101</div>
+      <ul class="cert-skills">
+        <li>Studied NoSQL databases and cloud DB services.</li>
+        <li>Learned database deployment and management concepts.</li>
+      </ul>
+      <a href="https://courses.cognitiveclass.ai/certificates/7d9925c423ce498fb34daf7e38a4a0e7" class="cert-link" target="_blank">VIEW CREDENTIAL</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-header reveal">
+    <div class="section-num">05</div>
+    <div class="section-title">CONTACT</div>
+  </div>
+
+  <div class="contact-wrapper">
+    <div class="reveal">
+      <div class="contact-heading">LET'S<br><span>CONNECT</span></div>
+      <div class="contact-sub">
+        Open to opportunities, collaborations,<br>
+        and all things IT. Reach out anytime.
+      </div>
+    </div>
+
+    <div class="contact-links reveal">
+      <a href="mailto:louitilos@gmail.com" class="contact-item">
+        <div class="contact-icon">@</div>
+        <div class="contact-info">
+          <span class="contact-label">EMAIL</span>
+          <span class="contact-val">louitilos@gmail.com</span>
+        </div>
+      </a>
+      <a href="https://github.com/JohnLouireeTilos/JohnLouireeTilos" target="_blank" class="contact-item">
+        <div class="contact-icon">&lt;/&gt;</div>
+        <div class="contact-info">
+          <span class="contact-label">GITHUB</span>
+          <span class="contact-val">github.com/JohnLouireeTilos</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 <span>JOHN LOUIREE B. TILOS</span></div>
+  <div>BUILT WITH <span>&lt;3</span> + MONOSPACE</div>
+</footer>
+
+<script>
+
+const canvas = document.getElementById('matrix-bg');
+const ctx = canvas.getContext('2d');
+let cols, drops;
+function initMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cols = Math.floor(canvas.width / 20);
+  drops = Array(cols).fill(1);
+}
+initMatrix();
+const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01'.split('');
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(3,5,5,0.04)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#00ff88';
+  ctx.font = '14px Share Tech Mono';
+  drops.forEach((y, i) => {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(char, i * 20, y * 20);
+    if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  });
+}
+setInterval(drawMatrix, 50);
+window.addEventListener('resize', initMatrix);
+
+/* ===== SCROLL REVEAL ===== */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+revealEls.forEach(el => io.observe(el));
+
+/* ===== SKILL BAR ANIMATION ===== */
+const fills = document.querySelectorAll('.skill-fill');
+const skillIO = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const w = e.target.dataset.width;
+      setTimeout(() => { e.target.style.width = w + '%'; }, 200);
+      skillIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+fills.forEach(f => skillIO.observe(f));
+
+/* ===== GLITCH INTERMITTENT ===== */
+const glitchEl = document.querySelector('.glitch');
+setInterval(() => {
+  glitchEl.style.animation = 'none';
+  setTimeout(() => glitchEl.style.animation = '', 50);
+}, 3000);
+</script>
 </body>
 </html>
